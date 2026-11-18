@@ -1,0 +1,10 @@
+{
+  "_comment": "Business rules configuration. Adjust thresholds to match your operational targets.",
+  "revenue_drop_threshold": 0.15,
+  "margin_floor_pct": 25.0,
+  "inventory_critical_days": 7,
+  "refund_rate_max_pct": 5.0,
+  "avg_revenue_per_unit_floor": 15.0,
+  "rules_version": "1.0",
+  "last_updated": "2024-11-18"
+}

@@ -1,0 +1,11 @@
+[
+  {
+    "id": "NOTIF-0001",
+    "message": "\ud83d\udea8 CRITICAL exception detected!",
+    "priority": "CRITICAL",
+    "recipient": "operations_team",
+    "channel": "log",
+    "queued_at": "2026-11-18T05:03:17.475084",
+    "status": "QUEUED"
+  }
+]

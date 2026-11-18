@@ -1,0 +1,18 @@
+[
+  {
+    "log_id": "LOG-00001",
+    "log_type": "EXCEPTION",
+    "logged_at": "2026-11-18T05:03:17.471904",
+    "data": {
+      "exception_id": "EXC-001",
+      "rule_name": "revenue_drop_threshold",
+      "severity": "HIGH",
+      "description": "Revenue declined by 21.2% \u2014 exceeds the 15.0% drop threshold",
+      "affected_dimension": "Overall Revenue",
+      "actual_value": -21.17,
+      "threshold_value": -15.0,
+      "unit": "%",
+      "detected_at": "2026-11-18T05:03:17.471096"
+    }
+  }
+]

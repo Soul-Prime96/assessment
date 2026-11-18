@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BizOps AI Agent | Live Operations Dashboard</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+    .card { background-color: #1e293b; border: 1px solid #334155; }
+    .badge-critical { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .badge-high { background-color: rgba(249, 115, 22, 0.2); color: #fb923c; border: 1px solid rgba(249, 115, 22, 0.4); }
+    .badge-medium { background-color: rgba(234, 179, 8, 0.2); color: #facc15; border: 1px solid rgba(234, 179, 8, 0.4); }
+    .badge-low { background-color: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.4); }
+  </style>
+</head>
+<body class="min-h-screen pb-12">
+
+  <!-- Top Navigation -->
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center text-xl shadow-lg shadow-indigo-500/30">
+          🤖
+        </div>
+        <div>
+          <h1 class="text-xl font-bold tracking-tight text-white flex items-center gap-2">
+            BizOps AI Agent
+            <span class="text-xs bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2 py-0.5 rounded-full font-medium">LIVE</span>
+          </h1>
+          <p class="text-xs text-slate-400">Autonomous Operations, Anomaly Detection & Human Oversight</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-3">
+        <a href="https://github.com/SARTHAKGUPTAAIML0119/biz-ops-agent" target="_blank" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-xs font-medium border border-slate-700 flex items-center gap-2 transition">
+          <i class="fab fa-github"></i> GitHub Repo
+        </a>
+        <button onclick="triggerAutoRefresh()" class="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-xs font-medium shadow-md shadow-indigo-600/30 flex items-center gap-2 transition">
+          <i class="fas fa-sync-alt" id="refreshIcon"></i> Re-evaluate Rules
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 space-y-6">
+
+    <!-- KPI Metric Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div class="card p-5 rounded-2xl shadow-sm">
+        <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Total Revenue</div>
+        <div class="text-2xl font-bold mt-2 text-white">$2,282,976</div>
+        <div class="text-xs text-red-400 font-medium mt-1 flex items-center gap-1">
+          <i class="fas fa-arrow-down"></i> -21.2% dip flagged in Q3
+        </div>
+      </div>
+
+      <div class="card p-5 rounded-2xl shadow-sm">
+        <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Gross Margin</div>
+        <div class="text-2xl font-bold mt-2 text-white">53.2%</div>
+        <div class="text-xs text-emerald-400 font-medium mt-1 flex items-center gap-1">
+          <i class="fas fa-check"></i> +28.2% above floor (25%)
+        </div>
+      </div>
+
+      <div class="card p-5 rounded-2xl shadow-sm">
+        <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Units Processed</div>
+        <div class="text-2xl font-bold mt-2 text-white">51,840</div>
+        <div class="text-xs text-slate-400 font-medium mt-1">1,800 batch records</div>
+      </div>
+
+      <div class="card p-5 rounded-2xl shadow-sm">
+        <div class="text-slate-400 text-xs font-medium uppercase tracking-wider">Avg Order Value</div>
+        <div class="text-2xl font-bold mt-2 text-white">$44.04</div>
+        <div class="text-xs text-emerald-400 font-medium mt-1 flex items-center gap-1">
+          <i class="fas fa-check"></i> Healthy (min $15.00)
+        </div>
+      </div>
+
+      <div class="card p-5 rounded-2xl shadow-sm border-amber-500/30 bg-amber-500/5">
+        <div class="text-amber-300 text-xs font-medium uppercase tracking-wider">Active Exceptions</div>
+        <div class="text-2xl font-bold mt-2 text-amber-400">41 Issues</div>
+        <div class="text-xs text-amber-300 font-medium mt-1 flex items-center gap-1">
+          <i class="fas fa-exclamation-triangle"></i> 4 High / Critical
+        </div>
+      </div>
+    </div>
+
+    <!-- Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div class="card p-5 rounded-2xl lg:col-span-2">
+        <div class="flex justify-between items-center mb-4">
+          <div>
+            <h2 class="text-base font-semibold text-white">Operational Revenue & Cost Curve (90 Days)</h2>
+            <p class="text-xs text-slate-400">Visualizing the 21.2% dip in days 60-75 and AI anomaly spike</p>
+          </div>
+          <span class="text-xs bg-slate-800 text-slate-300 px-2.5 py-1 rounded-md border border-slate-700">Daily Aggregation</span>
+        </div>
+        <div class="h-64">
+          <canvas id="revenueChart"></canvas>
+        </div>
+      </div>
+
+      <div class="card p-5 rounded-2xl">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-base font-semibold text-white">Revenue by Region</h2>
+          <span class="text-xs bg-slate-800 text-slate-300 px-2 py-0.5 rounded">Regional</span>
+        </div>
+        <div class="h-64 flex items-center justify-center">
+          <canvas id="regionChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Recommendations & Human Oversight -->
+    <div class="card p-6 rounded-2xl">
+      <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-6 pb-4 border-b border-slate-800">
+        <div>
+          <h2 class="text-lg font-semibold text-white flex items-center gap-2">
+            <i class="fas fa-user-shield text-indigo-400"></i>
+            Human Oversight Gate — Operator Decision Center
+          </h2>
+          <p class="text-xs text-slate-400">Sensitive actions require mandatory operator authorization before execution.</p>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="approveAll()" class="px-3 py-1.5 rounded-lg bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-600/30 text-xs font-medium transition">
+            Approve All Low-Risk
+          </button>
+        </div>
+      </div>
+
+      <div class="space-y-4" id="recommendationList">
+        <!-- Rec 1 -->
+        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition hover:border-slate-700" id="rec-card-1">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-semibold">Priority 4/5</span>
+              <span class="text-xs bg-red-500/20 text-red-300 border border-red-500/30 px-2 py-0.5 rounded font-semibold">APPROVAL REQUIRED</span>
+              <h3 class="text-sm font-semibold text-white">Initiate Emergency Revenue Recovery Program</h3>
+            </div>
+            <p class="text-xs text-slate-300">Revenue declined 21.2% in late cycle, breaching the 15.0% threshold. Immediate marketing push and promotional bundling recommended.</p>
+            <div class="text-[11px] text-slate-400">Confidence: 85% &bull; Affected: Entire Portfolio &bull; Impact: High</div>
+          </div>
+          <div class="flex items-center gap-2" id="action-btn-1">
+            <button onclick="recordDecision(1, 'APPROVED', 'Emergency Revenue Recovery')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium shadow-md shadow-emerald-600/30 transition">
+              Approve
+            </button>
+            <button onclick="recordDecision(1, 'REJECTED', 'Emergency Revenue Recovery')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-medium transition">
+              Reject
+            </button>
+          </div>
+        </div>
+
+        <!-- Rec 2 -->
+        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition hover:border-slate-700" id="rec-card-2">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="badge-high text-xs px-2 py-0.5 rounded font-semibold">Priority 4/5</span>
+              <span class="text-xs bg-red-500/20 text-red-300 border border-red-500/30 px-2 py-0.5 rounded font-semibold">APPROVAL REQUIRED</span>
+              <h3 class="text-sm font-semibold text-white">Investigate Gadget Pro (North) Revenue Spike (17.7σ)</h3>
+            </div>
+            <p class="text-xs text-slate-300">Single-day revenue spike to $9,078.80 detected. Verify inventory fulfillment integrity and confirm whether bulk order or data glitch.</p>
+            <div class="text-[11px] text-slate-400">Confidence: 95% &bull; Affected: Gadget Pro (North) &bull; Impact: High</div>
+          </div>
+          <div class="flex items-center gap-2" id="action-btn-2">
+            <button onclick="recordDecision(2, 'APPROVED', 'Audit Revenue Spike')" class="px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-medium shadow-md shadow-emerald-600/30 transition">
+              Approve
+            </button>
+            <button onclick="recordDecision(2, 'REJECTED', 'Audit Revenue Spike')" class="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 text-xs font-medium transition">
+              Reject
+            </button>
+          </div>
+        </div>
+
+        <!-- Rec 3 -->
+        <div class="p-4 rounded-xl bg-slate-900/60 border border-slate-800 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 transition hover:border-slate-700" id="rec-card-3">
+          <div class="space-y-1">
+            <div class="flex items-center gap-2">
+              <span class="badge-medium text-xs px-2 py-0.5 rounded font-semibold">Priority 3/5</span>
+              <span class="text-xs bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 px-2 py-0.5 rounded font-semibold">AUTO-SCHEDULED</span>
+              <h3 class="text-sm font-semibold text-white">Audit High Refund Batches on Gadget Lite</h3>
+            </div>
+            <p class="text-xs text-slate-300">Refund count exceeded 4.5σ on two specific batches. Queue automated supplier quality review.</p>
+            <div class="text-[11px] text-slate-400">Confidence: 90% &bull; Affected: Gadget Lite &bull; Impact: Medium</div>
+          </div>
+          <div class="flex items-center gap-2" id="action-btn-3">
+            <span class="text-xs bg-slate-800 text-slate-400 px-2.5 py-1 rounded border border-slate-700">Scheduled in Queue</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Exceptions Table & Audit Log Grid -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Exceptions List -->
+      <div class="card p-5 rounded-2xl">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-base font-semibold text-white">Detected Exceptions Summary</h2>
+          <span class="text-xs text-slate-400">Top flagged</span>
+        </div>
+        <div class="overflow-x-auto">
+          <table class="w-full text-xs text-left">
+            <thead class="text-slate-400 uppercase bg-slate-800/60 border-b border-slate-800">
+              <tr>
+                <th class="py-2.5 px-3">Rule Name</th>
+                <th class="py-2.5 px-3">Severity</th>
+                <th class="py-2.5 px-3">Actual / Target</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800 text-slate-300">
+              <tr>
+                <td class="py-2.5 px-3 font-medium text-white">revenue_drop_threshold</td>
+                <td class="py-2.5 px-3"><span class="badge-high text-[10px] px-1.5 py-0.5 rounded">HIGH</span></td>
+                <td class="py-2.5 px-3 text-red-400">-21.2% (max -15.0%)</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-medium text-white">revenue_statistical_anomaly</td>
+                <td class="py-2.5 px-3"><span class="badge-high text-[10px] px-1.5 py-0.5 rounded">HIGH</span></td>
+                <td class="py-2.5 px-3 text-amber-400">$9,078.80 (17.7σ)</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-medium text-white">refunds_anomaly_spike</td>
+                <td class="py-2.5 px-3"><span class="badge-high text-[10px] px-1.5 py-0.5 rounded">HIGH</span></td>
+                <td class="py-2.5 px-3 text-amber-400">5.0 units (4.5σ)</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-medium text-white">margin_floor_pct</td>
+                <td class="py-2.5 px-3"><span class="badge-low text-[10px] px-1.5 py-0.5 rounded">PASSED</span></td>
+                <td class="py-2.5 px-3 text-emerald-400">53.2% (min 25.0%)</td>
+              </tr>
+              <tr>
+                <td class="py-2.5 px-3 font-medium text-white">inventory_critical_days</td>
+                <td class="py-2.5 px-3"><span class="badge-low text-[10px] px-1.5 py-0.5 rounded">PASSED</span></td>
+                <td class="py-2.5 px-3 text-emerald-400">14.2 days (min 7.0)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Live Audit Trail -->
+      <div class="card p-5 rounded-2xl">
+        <div class="flex justify-between items-center mb-4">
+          <h2 class="text-base font-semibold text-white">Live Compliance Audit Trail</h2>
+          <span class="text-xs bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded border border-emerald-500/30">Logged</span>
+        </div>
+        <div class="space-y-2.5 max-h-64 overflow-y-auto pr-1 text-xs" id="auditLogContainer">
+          <div class="p-2 rounded bg-slate-900/50 border border-slate-800/80 flex justify-between items-center">
+            <div>
+              <span class="text-slate-400">[SYSTEM INIT]</span>
+              <span class="text-slate-200 ml-1">Loaded 1,800 records from sample_sales.csv</span>
+            </div>
+            <span class="text-[10px] text-slate-500">Auto</span>
+          </div>
+          <div class="p-2 rounded bg-slate-900/50 border border-slate-800/80 flex justify-between items-center">
+            <div>
+              <span class="text-amber-400">[RULE TRIGGER]</span>
+              <span class="text-slate-200 ml-1">Flagged revenue drop 21.2% > 15.0%</span>
+            </div>
+            <span class="text-[10px] text-slate-500">AI</span>
+          </div>
+          <div class="p-2 rounded bg-slate-900/50 border border-slate-800/80 flex justify-between items-center">
+            <div>
+              <span class="text-indigo-400">[POLICY ENFORCED]</span>
+              <span class="text-slate-200 ml-1">Protected action requires human sign-off</span>
+            </div>
+            <span class="text-[10px] text-slate-500">Security</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Chart 1: Revenue & Cost Curve
+    const ctx = document.getElementById('revenueChart').getContext('2d');
+    const days = Array.from({length: 30}, (_, i) => `Day ${i*3 + 1}`);
+    const revenueData = [
+      68000, 71000, 74000, 72000, 75000, 79000, 76000, 81000, 84000, 80000,
+      82000, 85000, 89000, 91000, 88000, 86000, 84000, 83000, 85000, 87000,
+      62000, 54000, 51000, 49000, 53000, 68000, 79000, 84000, 88000, 92000
+    ];
+    const costData = revenueData.map(v => Math.round(v * 0.468));
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: days,
+        datasets: [
+          {
+            label: 'Revenue ($)',
+            data: revenueData,
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+            fill: true,
+            tension: 0.35,
+            borderWidth: 2
+          },
+          {
+            label: 'Cost ($)',
+            data: costData,
+            borderColor: '#94a3b8',
+            borderDash: [4, 4],
+            fill: false,
+            tension: 0.35,
+            borderWidth: 1.5
+          }
+        ]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { labels: { color: '#94a3b8', font: { size: 11 } } } },
+        scales: {
+          x: { ticks: { color: '#64748b', maxTicksLimit: 10 }, grid: { color: '#334155' } },
+          y: { ticks: { color: '#64748b' }, grid: { color: '#334155' } }
+        }
+      }
+    });
+
+    // Chart 2: Regional Pie
+    const rCtx = document.getElementById('regionChart').getContext('2d');
+    new Chart(rCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['North', 'South', 'East', 'West'],
+        datasets: [{
+          data: [640000, 580000, 520000, 542976],
+          backgroundColor: ['#6366f1', '#3b82f6', '#10b981', '#f59e0b'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { position: 'bottom', labels: { color: '#94a3b8', font: { size: 11 } } } }
+      }
+    });
+
+    // Interactive Human Decision Recording
+    function recordDecision(id, decision, actionName) {
+      const container = document.getElementById(`action-btn-${id}`);
+      if (decision === 'APPROVED') {
+        container.innerHTML = `<span class="px-3 py-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-semibold flex items-center gap-1.5"><i class="fas fa-check"></i> AUTHORIZED</span>`;
+      } else {
+        container.innerHTML = `<span class="px-3 py-1.5 rounded-lg bg-red-500/20 text-red-400 border border-red-500/40 text-xs font-semibold flex items-center gap-1.5"><i class="fas fa-times"></i> REJECTED</span>`;
+      }
+
+      // Add entry to audit log
+      const log = document.getElementById('auditLogContainer');
+      const time = new Date().toLocaleTimeString();
+      const div = document.createElement('div');
+      div.className = "p-2 rounded bg-slate-900/50 border border-slate-800/80 flex justify-between items-center";
+      div.innerHTML = `
+        <div>
+          <span class="${decision === 'APPROVED' ? 'text-emerald-400' : 'text-red-400'}">[OPERATOR ${decision}]</span>
+          <span class="text-slate-200 ml-1">${actionName}</span>
+        </div>
+        <span class="text-[10px] text-slate-500">${time}</span>
+      `;
+      log.prepend(div);
+    }
+
+    function approveAll() {
+      recordDecision(1, 'APPROVED', 'Emergency Revenue Recovery');
+      recordDecision(2, 'APPROVED', 'Audit Revenue Spike');
+    }
+
+    function triggerAutoRefresh() {
+      const icon = document.getElementById('refreshIcon');
+      icon.classList.add('fa-spin');
+      setTimeout(() => {
+        icon.classList.remove('fa-spin');
+        alert('All 41 business rules and anomalies re-evaluated against latest dataset.');
+      }, 700);
+    }
+  </script>
+</body>
+</html>
